@@ -106,6 +106,7 @@ class LotteryRunner(Runner):
         new_model.save(location, self.desc.train_start_step)
 
     def _train_level(self, level: int):
+        #import pdb; pdb.set_trace()
         location = self.desc.run_path(self.replicate, level)
         if models.registry.exists(location, self.desc.train_end_step): return
 

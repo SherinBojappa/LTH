@@ -5,6 +5,7 @@
 
 import time
 import torch
+import wandb
 
 from datasets.base import DataLoader
 from foundations import hparams
@@ -71,6 +72,9 @@ def create_eval_callback(eval_name: str, loader: DataLoader, verbose=False):
         total_loss = total_loss.cpu().item()
         total_correct = total_correct.cpu().item()
         example_count = example_count.cpu().item()
+        
+        wandb.log({"test_loss": total_loss / example_count,
+                   "test_accuracy": total_correct / example_count})
 
         if get_platform().is_primary_process:
             logger.add('{}_loss'.format(eval_name), step, total_loss / example_count)

@@ -5,6 +5,7 @@
 
 import typing
 import warnings
+import wandb
 
 from datasets.base import DataLoader
 import datasets.registry
@@ -59,6 +60,8 @@ def train(
     if not get_platform().exists(output_location) and get_platform().is_primary_process:
         get_platform().makedirs(output_location)
 
+    wandb.init(project="LTH")
+
     # Get the optimizer and learning rate schedule.
     model.to(get_platform().torch_device)
     optimizer = optimizers.get_optimizer(training_hparams, model)
@@ -91,6 +94,7 @@ def train(
     end_step = end_step or Step.from_str(training_hparams.training_steps, train_loader.iterations_per_epoch)
     if end_step <= start_step: return
 
+    wandb.watch(model)
     # The training loop.
     for ep in range(start_step.ep, end_step.ep + 1):
 
@@ -121,13 +125,17 @@ def train(
                     scaled_loss.backward()
             else:
                 loss.backward()
-
+            
+            wandb.log({"train_loss": loss,
+                       "learning_rate": step_optimizer.param_groups[0]['lr'],
+                       "epoch": ep})
             # Step forward. Ignore extraneous warnings that the lr_schedule generates.
             step_optimizer.step()
             with warnings.catch_warnings():  # Filter unnecessary warning.
                 warnings.filterwarnings("ignore", category=UserWarning)
                 lr_schedule.step()
 
+    wandb.finish()
     get_platform().barrier()
 
 

@@ -30,7 +30,6 @@ def main():
     usage = '\n' + welcome + '\n'
     usage += 'open_lth.py {} [...] => {}'.format(runner_name, runner_registry.get(runner_name).description())
     usage += '\n' + '='*82 + '\n'
-
     parser = argparse.ArgumentParser(usage=usage, conflict_handler='resolve')
     parser.add_argument('subcommand')
     parser.add_argument('--platform', default='local', help='The platform on which to run the job.')
