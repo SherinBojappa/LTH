@@ -4,6 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 
 import argparse
+import os
+import io
 import torch
 import torch.nn as nn
 
@@ -72,11 +74,15 @@ class LotteryRunner(Runner):
         get_platform().barrier()
 
         output_filename = "ranks_output.txt"
+        if os.path.exists(output_filename):
+            os.remove(output_filename)
+
+        fh = open(output_filename, 'a')
 
         for level in range(self.levels+1):
             if get_platform().is_primary_process: self._prune_level(level)
             get_platform().barrier()
-            self._train_level(level, output_filename)
+            self._train_level(level, output_filename, fh)
 
     # Helper methods for running the lottery.
     def _pretrain(self):
@@ -109,24 +115,38 @@ class LotteryRunner(Runner):
 
         new_model.save(location, self.desc.train_start_step)
 
-    def _train_level(self, level: int, output_filename: str):
+    def _train_level(self, level: int, output_filename: str, fh: io.TextIOWrapper):
         #import pdb; pdb.set_trace()
         location = self.desc.run_path(self.replicate, level)
         if models.registry.exists(location, self.desc.train_end_step): return
 
         model = models.registry.load(self.desc.run_path(self.replicate, 0), self.desc.train_start_step,
                                      self.desc.model_hparams, self.desc.train_outputs)
-        # compute the rank before pruning including the level of pruning
-        self._compute_rank(model, level, output_filename)
+        # compute the rank before pruning; level 0 compares to just the initialized model
+        # before training, level 1 first level of pruning
+        if level == 0:
+            fh.write(f"Model architecture\n")
+            fh.write(f"{model}")
+            fh.write(f"Rank of the unpruned model\n")
+            self._compute_rank(model, level, output_filename, fh)
         pruned_model = PrunedModel(model, Mask.load(location))
         # compute rank after pruning including the level of pruning
-        self._compute_rank(pruned_model, level, output_filename)
+        # level 0 is just full training of the network
+        if level != 0:
+            fh.write(f"Rank of the pruned model before training\n")
+            self._compute_rank(pruned_model, level, output_filename, fh)
+
         pruned_model.save(location, self.desc.train_start_step)
         if self.verbose and get_platform().is_primary_process:
             print('-'*82 + '\nPruning Level {}\n'.format(level) + '-'*82)
         train.standard_train(pruned_model, location, self.desc.dataset_hparams, self.desc.training_hparams,
                              start_step=self.desc.train_start_step, verbose=self.verbose,
                              evaluate_every_epoch=self.evaluate_every_epoch)
+        if level != 0:
+            fh.write(f"Rank of the pruned model after training\n")
+        else:
+            fh.write(f"Rank of the unpruned model after training\n")
+        self._compute_rank(pruned_model, level, output_filename, fh)
 
     def _prune_level(self, level: int):
         new_location = self.desc.run_path(self.replicate, level)
@@ -140,19 +160,19 @@ class LotteryRunner(Runner):
                                          self.desc.model_hparams, self.desc.train_outputs)
             pruning.registry.get(self.desc.pruning_hparams)(model, Mask.load(old_location)).save(new_location)
 
-    def _compute_rank(self, model, level, output_filename):
+    def _compute_rank(self, model, level, output_filename, fh):
         ranks = {}
-        with open(output_filename, "w") as output_file:
-            for name, layer in model.named_modules():
-                if isinstance(layer, (nn.Linear, nn.Conv2d)):
-                    # For linear layers, use the weight matrix directly
-                    if isinstance(layer, nn.Linear):
-                        weight_matrix = layer.weight.detach().cpu()
-                    # For convolutional layers, reshape the weight tensor into a 2D matrix
-                    else:
-                        weight_matrix = layer.weight.view(layer.weight.size(0), -1).detach().cpu()
 
-                    rank = torch.matrix_rank(weight_matrix)
-                    ranks[name] = rank
-                    output_line = f"Level_{level}: Rank of layer '{name}': {rank}\n"
-                    output_file.write(output_line)
+        for name, layer in model.named_modules():
+            if isinstance(layer, (nn.Linear, nn.Conv2d)):
+                # For linear layers, use the weight matrix directly
+                if isinstance(layer, nn.Linear):
+                    weight_matrix = layer.weight.detach().cpu()
+                # For convolutional layers, reshape the weight tensor into a 2D matrix
+                else:
+                    weight_matrix = layer.weight.view(layer.weight.size(0), -1).detach().cpu()
+
+                rank = torch.matrix_rank(weight_matrix)
+                ranks[name] = rank
+                output_line = f"Level_{level}: Rank of layer '{name}': {rank}\n"
+                fh.write(output_line)
