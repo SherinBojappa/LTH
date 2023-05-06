@@ -4,6 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 
 import argparse
+import torch
+import torch.nn as nn
 
 from cli import shared_args
 from dataclasses import dataclass
@@ -69,10 +71,12 @@ class LotteryRunner(Runner):
         if get_platform().is_primary_process: self._establish_initial_weights()
         get_platform().barrier()
 
+        output_filename = "ranks_output.txt"
+
         for level in range(self.levels+1):
             if get_platform().is_primary_process: self._prune_level(level)
             get_platform().barrier()
-            self._train_level(level)
+            self._train_level(level, output_filename)
 
     # Helper methods for running the lottery.
     def _pretrain(self):
@@ -105,14 +109,18 @@ class LotteryRunner(Runner):
 
         new_model.save(location, self.desc.train_start_step)
 
-    def _train_level(self, level: int):
+    def _train_level(self, level: int, output_filename: str):
         #import pdb; pdb.set_trace()
         location = self.desc.run_path(self.replicate, level)
         if models.registry.exists(location, self.desc.train_end_step): return
 
         model = models.registry.load(self.desc.run_path(self.replicate, 0), self.desc.train_start_step,
                                      self.desc.model_hparams, self.desc.train_outputs)
+        # compute the rank before pruning including the level of pruning
+        self._compute_rank(model, level, output_filename)
         pruned_model = PrunedModel(model, Mask.load(location))
+        # compute rank after pruning including the level of pruning
+        self._compute_rank(pruned_model, level, output_filename)
         pruned_model.save(location, self.desc.train_start_step)
         if self.verbose and get_platform().is_primary_process:
             print('-'*82 + '\nPruning Level {}\n'.format(level) + '-'*82)
@@ -131,3 +139,20 @@ class LotteryRunner(Runner):
             model = models.registry.load(old_location, self.desc.train_end_step,
                                          self.desc.model_hparams, self.desc.train_outputs)
             pruning.registry.get(self.desc.pruning_hparams)(model, Mask.load(old_location)).save(new_location)
+
+    def _compute_rank(self, model, level, output_filename):
+        ranks = {}
+        with open(output_filename, "w") as output_file:
+            for name, layer in model.named_modules():
+                if isinstance(layer, (nn.Linear, nn.Conv2d)):
+                    # For linear layers, use the weight matrix directly
+                    if isinstance(layer, nn.Linear):
+                        weight_matrix = layer.weight.detach().cpu()
+                    # For convolutional layers, reshape the weight tensor into a 2D matrix
+                    else:
+                        weight_matrix = layer.weight.view(layer.weight.size(0), -1).detach().cpu()
+
+                    rank = torch.matrix_rank(weight_matrix)
+                    ranks[name] = rank
+                    output_line = f"Level_{level}: Rank of layer '{name}': {rank}\n"
+                    output_file.write(output_line)
