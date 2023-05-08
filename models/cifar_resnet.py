@@ -150,7 +150,7 @@ class Model(base.Model):
 
         pruning_hparams = sparse_global.PruningHparams(
             pruning_strategy='sparse_global',
-            pruning_fraction=0.2
+            pruning_fraction=0.9
         )
 
         return LotteryDesc(model_hparams, dataset_hparams, training_hparams, pruning_hparams)

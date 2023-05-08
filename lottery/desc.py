@@ -67,6 +67,7 @@ class LotteryDesc(Desc):
         pruning_strategy = arg_utils.maybe_get_arg('pruning_strategy')
         if defaults and not pruning_strategy: pruning_strategy = defaults.pruning_hparams.pruning_strategy
         if pruning_strategy:
+            #import pdb; pdb.set_trace()
             pruning_hparams = pruning.registry.get_pruning_hparams(pruning_strategy)
             if defaults and defaults.pruning_hparams.pruning_strategy == pruning_strategy:
                 def_ph = defaults.pruning_hparams
