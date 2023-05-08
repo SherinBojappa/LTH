@@ -73,7 +73,7 @@ class LotteryRunner(Runner):
         if get_platform().is_primary_process: self._establish_initial_weights()
         get_platform().barrier()
 
-        output_filename = "ranks_output.txt"
+        output_filename = "ranks_output_eigen.txt"
         if os.path.exists(output_filename):
             os.remove(output_filename)
 
@@ -128,13 +128,13 @@ class LotteryRunner(Runner):
             fh.write(f"Model architecture\n")
             fh.write(f"{model}")
             fh.write(f"Rank of the unpruned model\n")
-            self._compute_rank(model, level, output_filename, fh)
+            self._compute_rank_svd(model, level, output_filename, fh)
         pruned_model = PrunedModel(model, Mask.load(location))
         # compute rank after pruning including the level of pruning
         # level 0 is just full training of the network
         if level != 0:
             fh.write(f"Rank of the pruned model before training\n")
-            self._compute_rank(pruned_model, level, output_filename, fh)
+            self._compute_rank_svd(pruned_model, level, output_filename, fh)
 
         pruned_model.save(location, self.desc.train_start_step)
         if self.verbose and get_platform().is_primary_process:
@@ -146,7 +146,7 @@ class LotteryRunner(Runner):
             fh.write(f"Rank of the pruned model after training\n")
         else:
             fh.write(f"Rank of the unpruned model after training\n")
-        self._compute_rank(pruned_model, level, output_filename, fh)
+        self._compute_rank_svd(pruned_model, level, output_filename, fh)
 
     def _prune_level(self, level: int):
         new_location = self.desc.run_path(self.replicate, level)
@@ -179,3 +179,26 @@ class LotteryRunner(Runner):
                 fh.write(file_op)
                 output_line = f"Level_{level}: Rank of layer '{name}': {rank}\n"
                 fh.write(output_line)
+
+    def _compute_rank_svd(self, model, level, output_filename, fh):
+        ranks = {}
+
+        for name, layer in model.named_modules():
+            if isinstance(layer, (nn.Linear, nn.Conv2d)):
+                # For linear layers, use the weight matrix directly
+                if isinstance(layer, nn.Linear):
+                    weight_matrix = layer.weight.detach().cpu()
+                # For convolutional layers, reshape the weight tensor into a 2D matrix
+                else:
+                    weight_matrix = layer.weight.view(layer.weight.size(0), -1).detach().cpu()
+
+                l1_norm = torch.sum(torch.abs(weight_matrix)).item()
+                u, s, v = torch.svd(weight_matrix)
+                threshold = torch.max(s)*1e-5
+                rank = (s > threshold).sum().item()
+                ranks[name] = rank
+                file_op = f"L1 norm of layer {name} is {l1_norm}"
+                fh.write(file_op)
+                output_line = f"Level_{level}: Rank of layer '{name}': {rank}\n"
+                fh.write(output_line)
+
