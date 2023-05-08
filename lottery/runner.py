@@ -172,7 +172,10 @@ class LotteryRunner(Runner):
                 else:
                     weight_matrix = layer.weight.view(layer.weight.size(0), -1).detach().cpu()
 
+                l1_norm = torch.sum(torch.abs(weight_matrix)).item()
                 rank = torch.matrix_rank(weight_matrix)
                 ranks[name] = rank
+                file_op = f"L1 norm of layer {name} is {l1_norm}"
+                fh.write(file_op)
                 output_line = f"Level_{level}: Rank of layer '{name}': {rank}\n"
                 fh.write(output_line)
