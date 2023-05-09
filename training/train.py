@@ -126,8 +126,10 @@ def train(
             else:
                 loss.backward()
 
+            curr_lr = lr_schedule.get_last_lr()[0]
+
             wandb.log({"train_loss": loss,
-                       "learning_rate": step_optimizer.param_groups[0]['lr'],
+                       "learning_rate": curr_lr,
                        "epoch": ep})
             # Step forward. Ignore extraneous warnings that the lr_schedule generates.
             step_optimizer.step()

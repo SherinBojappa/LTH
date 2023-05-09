@@ -194,7 +194,8 @@ class LotteryRunner(Runner):
 
                 l1_norm = torch.sum(torch.abs(weight_matrix)).item()
                 u, s, v = torch.svd(weight_matrix)
-                threshold = torch.max(s)*1e-4
+                # threshold 1e-5 and 1e-4 not much difference in the rank between pruned and unpruned
+                threshold = torch.max(s)*1e-2
                 rank = (s > threshold).sum().item()
                 ranks[name] = rank
                 file_op = f"L1 norm of layer {name} is {l1_norm}"
