@@ -6,6 +6,7 @@
 import argparse
 import os
 import io
+import csv
 import torch
 import torch.nn as nn
 
@@ -74,15 +75,22 @@ class LotteryRunner(Runner):
         get_platform().barrier()
 
         output_filename = "ranks_output_svd.txt"
+        singular_values_filename = "singular_values.csv"
         if os.path.exists(output_filename):
             os.remove(output_filename)
 
+        if os.path.exists(singular_values_filename):
+            os.remove(singular_values_filename)
+
+
         fh = open(output_filename, 'a')
+        ch = open(singular_values_filename, 'a')
+        csv_writer = csv.writer(ch)
 
         for level in range(self.levels+1):
             if get_platform().is_primary_process: self._prune_level(level)
             get_platform().barrier()
-            self._train_level(level, output_filename, fh)
+            self._train_level(level, output_filename, fh, csv_writer)
 
     # Helper methods for running the lottery.
     def _pretrain(self):
@@ -115,7 +123,7 @@ class LotteryRunner(Runner):
 
         new_model.save(location, self.desc.train_start_step)
 
-    def _train_level(self, level: int, output_filename: str, fh: io.TextIOWrapper):
+    def _train_level(self, level: int, output_filename: str, fh: io.TextIOWrapper, csv_writer: csv.writer):
         #import pdb; pdb.set_trace()
         location = self.desc.run_path(self.replicate, level)
         if models.registry.exists(location, self.desc.train_end_step): return
@@ -128,13 +136,15 @@ class LotteryRunner(Runner):
             fh.write(f"Model architecture\n")
             fh.write(f"{model}")
             fh.write(f"Rank of the unpruned model\n")
-            self._compute_rank_svd(model, level, output_filename, fh)
+            self._compute_rank_svd(model, level, output_filename, fh, csv_writer)
+            csv_writer.writerow([])
         pruned_model = PrunedModel(model, Mask.load(location))
         # compute rank after pruning including the level of pruning
         # level 0 is just full training of the network
         if level != 0:
             fh.write(f"Rank of the pruned model before training\n")
-            self._compute_rank_svd(pruned_model, level, output_filename, fh)
+            self._compute_rank_svd(pruned_model, level, output_filename, fh, csv_writer)
+            csv_writer.writerow([])
 
         pruned_model.save(location, self.desc.train_start_step)
         if self.verbose and get_platform().is_primary_process:
@@ -146,7 +156,8 @@ class LotteryRunner(Runner):
             fh.write(f"Rank of the pruned model after training\n")
         else:
             fh.write(f"Rank of the unpruned model after training\n")
-        self._compute_rank_svd(pruned_model, level, output_filename, fh)
+        self._compute_rank_svd(pruned_model, level, output_filename, fh, csv_writer)
+        csv_writer.writerow([])
 
     def _prune_level(self, level: int):
         new_location = self.desc.run_path(self.replicate, level)
@@ -180,7 +191,7 @@ class LotteryRunner(Runner):
                 output_line = f"Level_{level}: Rank of layer '{name}': {rank}\n"
                 fh.write(output_line)
 
-    def _compute_rank_svd(self, model, level, output_filename, fh):
+    def _compute_rank_svd(self, model, level, output_filename, fh, csv_writer):
         ranks = {}
 
         for name, layer in model.named_modules():
@@ -195,7 +206,9 @@ class LotteryRunner(Runner):
                 l1_norm = torch.sum(torch.abs(weight_matrix)).item()
                 u, s, v = torch.svd(weight_matrix)
                 # threshold 1e-5 and 1e-4 not much difference in the rank between pruned and unpruned
-                threshold = torch.max(s)*1e-2
+                threshold = torch.max(s)*0.5
+                # log the singular values
+                csv_writer.writerow(s.tolist())
                 rank = (s > threshold).sum().item()
                 ranks[name] = rank
                 file_op = f"L1 norm of layer {name} is {l1_norm}"
