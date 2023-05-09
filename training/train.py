@@ -125,7 +125,7 @@ def train(
                     scaled_loss.backward()
             else:
                 loss.backward()
-            
+
             wandb.log({"train_loss": loss,
                        "learning_rate": step_optimizer.param_groups[0]['lr'],
                        "epoch": ep})

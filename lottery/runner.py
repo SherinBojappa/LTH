@@ -73,7 +73,7 @@ class LotteryRunner(Runner):
         if get_platform().is_primary_process: self._establish_initial_weights()
         get_platform().barrier()
 
-        output_filename = "ranks_output_eigen.txt"
+        output_filename = "ranks_output_svd.txt"
         if os.path.exists(output_filename):
             os.remove(output_filename)
 
@@ -194,11 +194,10 @@ class LotteryRunner(Runner):
 
                 l1_norm = torch.sum(torch.abs(weight_matrix)).item()
                 u, s, v = torch.svd(weight_matrix)
-                threshold = torch.max(s)*1e-5
+                threshold = torch.max(s)*1e-4
                 rank = (s > threshold).sum().item()
                 ranks[name] = rank
                 file_op = f"L1 norm of layer {name} is {l1_norm}"
                 fh.write(file_op)
                 output_line = f"Level_{level}: Rank of layer '{name}': {rank}\n"
                 fh.write(output_line)
-
