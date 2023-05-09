@@ -1,0 +1,169 @@
+Model architecture
+Model(
+  (conv): Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+  (bn): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (blocks): Sequential(
+    (0): Block(
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+    (1): Block(
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+    (2): Block(
+      (conv1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+    (3): Block(
+      (conv1): Conv2d(16, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(16, 32, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (4): Block(
+      (conv1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+    (5): Block(
+      (conv1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+    (6): Block(
+      (conv1): Conv2d(32, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(32, 64, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (7): Block(
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+    (8): Block(
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (fc): Linear(in_features=64, out_features=10, bias=True)
+  (criterion): CrossEntropyLoss()
+)Rank of the unpruned model
+L1 norm of layer conv is 97.72562408447266Level_0: Rank of layer 'conv': 16
+L1 norm of layer blocks.0.conv1 is 215.4957275390625Level_0: Rank of layer 'blocks.0.conv1': 16
+L1 norm of layer blocks.0.conv2 is 217.88543701171875Level_0: Rank of layer 'blocks.0.conv2': 16
+L1 norm of layer blocks.1.conv1 is 215.3814239501953Level_0: Rank of layer 'blocks.1.conv1': 16
+L1 norm of layer blocks.1.conv2 is 221.2508544921875Level_0: Rank of layer 'blocks.1.conv2': 16
+L1 norm of layer blocks.2.conv1 is 214.2424774169922Level_0: Rank of layer 'blocks.2.conv1': 16
+L1 norm of layer blocks.2.conv2 is 219.61618041992188Level_0: Rank of layer 'blocks.2.conv2': 16
+L1 norm of layer blocks.3.conv1 is 436.8306884765625Level_0: Rank of layer 'blocks.3.conv1': 32
+L1 norm of layer blocks.3.conv2 is 608.3369140625Level_0: Rank of layer 'blocks.3.conv2': 32
+L1 norm of layer blocks.3.shortcut.0 is 144.45736694335938Level_0: Rank of layer 'blocks.3.shortcut.0': 16
+L1 norm of layer blocks.4.conv1 is 612.8937377929688Level_0: Rank of layer 'blocks.4.conv1': 32
+L1 norm of layer blocks.4.conv2 is 613.1417236328125Level_0: Rank of layer 'blocks.4.conv2': 32
+L1 norm of layer blocks.5.conv1 is 619.928466796875Level_0: Rank of layer 'blocks.5.conv1': 32
+L1 norm of layer blocks.5.conv2 is 611.73046875Level_0: Rank of layer 'blocks.5.conv2': 32
+L1 norm of layer blocks.6.conv1 is 1225.8028564453125Level_0: Rank of layer 'blocks.6.conv1': 64
+L1 norm of layer blocks.6.conv2 is 1731.2763671875Level_0: Rank of layer 'blocks.6.conv2': 64
+L1 norm of layer blocks.6.shortcut.0 is 402.0904235839844Level_0: Rank of layer 'blocks.6.shortcut.0': 32
+L1 norm of layer blocks.7.conv1 is 1746.45751953125Level_0: Rank of layer 'blocks.7.conv1': 64
+L1 norm of layer blocks.7.conv2 is 1722.4471435546875Level_0: Rank of layer 'blocks.7.conv2': 64
+L1 norm of layer blocks.8.conv1 is 1736.846435546875Level_0: Rank of layer 'blocks.8.conv1': 64
+L1 norm of layer blocks.8.conv2 is 1719.68310546875Level_0: Rank of layer 'blocks.8.conv2': 64
+L1 norm of layer fc is 92.37808227539062Level_0: Rank of layer 'fc': 10
+Rank of the unpruned model after training
+L1 norm of layer model.conv is 97.00709533691406Level_0: Rank of layer 'model.conv': 16
+L1 norm of layer model.blocks.0.conv1 is 219.46609497070312Level_0: Rank of layer 'model.blocks.0.conv1': 16
+L1 norm of layer model.blocks.0.conv2 is 220.1085205078125Level_0: Rank of layer 'model.blocks.0.conv2': 16
+L1 norm of layer model.blocks.1.conv1 is 216.661376953125Level_0: Rank of layer 'model.blocks.1.conv1': 16
+L1 norm of layer model.blocks.1.conv2 is 226.82662963867188Level_0: Rank of layer 'model.blocks.1.conv2': 16
+L1 norm of layer model.blocks.2.conv1 is 215.8277130126953Level_0: Rank of layer 'model.blocks.2.conv1': 16
+L1 norm of layer model.blocks.2.conv2 is 223.32220458984375Level_0: Rank of layer 'model.blocks.2.conv2': 16
+L1 norm of layer model.blocks.3.conv1 is 442.18798828125Level_0: Rank of layer 'model.blocks.3.conv1': 32
+L1 norm of layer model.blocks.3.conv2 is 633.4906005859375Level_0: Rank of layer 'model.blocks.3.conv2': 32
+L1 norm of layer model.blocks.3.shortcut.0 is 143.8857421875Level_0: Rank of layer 'model.blocks.3.shortcut.0': 16
+L1 norm of layer model.blocks.4.conv1 is 627.8917236328125Level_0: Rank of layer 'model.blocks.4.conv1': 32
+L1 norm of layer model.blocks.4.conv2 is 638.5274047851562Level_0: Rank of layer 'model.blocks.4.conv2': 32
+L1 norm of layer model.blocks.5.conv1 is 630.556884765625Level_0: Rank of layer 'model.blocks.5.conv1': 32
+L1 norm of layer model.blocks.5.conv2 is 631.3509521484375Level_0: Rank of layer 'model.blocks.5.conv2': 32
+L1 norm of layer model.blocks.6.conv1 is 1249.6434326171875Level_0: Rank of layer 'model.blocks.6.conv1': 64
+L1 norm of layer model.blocks.6.conv2 is 1832.58349609375Level_0: Rank of layer 'model.blocks.6.conv2': 64
+L1 norm of layer model.blocks.6.shortcut.0 is 402.5027160644531Level_0: Rank of layer 'model.blocks.6.shortcut.0': 32
+L1 norm of layer model.blocks.7.conv1 is 1811.0848388671875Level_0: Rank of layer 'model.blocks.7.conv1': 64
+L1 norm of layer model.blocks.7.conv2 is 1814.556640625Level_0: Rank of layer 'model.blocks.7.conv2': 64
+L1 norm of layer model.blocks.8.conv1 is 1794.895751953125Level_0: Rank of layer 'model.blocks.8.conv1': 64
+L1 norm of layer model.blocks.8.conv2 is 1859.125732421875Level_0: Rank of layer 'model.blocks.8.conv2': 64
+L1 norm of layer model.fc is 124.10648345947266Level_0: Rank of layer 'model.fc': 10
+Rank of the pruned model before training
+L1 norm of layer model.conv is 88.10826110839844Level_1: Rank of layer 'model.conv': 16
+L1 norm of layer model.blocks.0.conv1 is 122.93742370605469Level_1: Rank of layer 'model.blocks.0.conv1': 16
+L1 norm of layer model.blocks.0.conv2 is 121.26996612548828Level_1: Rank of layer 'model.blocks.0.conv2': 16
+L1 norm of layer model.blocks.1.conv1 is 120.5364990234375Level_1: Rank of layer 'model.blocks.1.conv1': 16
+L1 norm of layer model.blocks.1.conv2 is 128.49066162109375Level_1: Rank of layer 'model.blocks.1.conv2': 16
+L1 norm of layer model.blocks.2.conv1 is 121.45536041259766Level_1: Rank of layer 'model.blocks.2.conv1': 16
+L1 norm of layer model.blocks.2.conv2 is 126.78916931152344Level_1: Rank of layer 'model.blocks.2.conv2': 16
+L1 norm of layer model.blocks.3.conv1 is 246.92816162109375Level_1: Rank of layer 'model.blocks.3.conv1': 32
+L1 norm of layer model.blocks.3.conv2 is 201.805419921875Level_1: Rank of layer 'model.blocks.3.conv2': 32
+L1 norm of layer model.blocks.3.shortcut.0 is 133.99078369140625Level_1: Rank of layer 'model.blocks.3.shortcut.0': 16
+L1 norm of layer model.blocks.4.conv1 is 200.49160766601562Level_1: Rank of layer 'model.blocks.4.conv1': 32
+L1 norm of layer model.blocks.4.conv2 is 209.04232788085938Level_1: Rank of layer 'model.blocks.4.conv2': 32
+L1 norm of layer model.blocks.5.conv1 is 206.15560913085938Level_1: Rank of layer 'model.blocks.5.conv1': 32
+L1 norm of layer model.blocks.5.conv2 is 208.9939727783203Level_1: Rank of layer 'model.blocks.5.conv2': 32
+L1 norm of layer model.blocks.6.conv1 is 410.3928527832031Level_1: Rank of layer 'model.blocks.6.conv1': 64
+L1 norm of layer model.blocks.6.conv2 is 227.8388214111328Level_1: Rank of layer 'model.blocks.6.conv2': 64
+L1 norm of layer model.blocks.6.shortcut.0 is 351.07861328125Level_1: Rank of layer 'model.blocks.6.shortcut.0': 32
+L1 norm of layer model.blocks.7.conv1 is 218.87368774414062Level_1: Rank of layer 'model.blocks.7.conv1': 64
+L1 norm of layer model.blocks.7.conv2 is 217.9708251953125Level_1: Rank of layer 'model.blocks.7.conv2': 64
+L1 norm of layer model.blocks.8.conv1 is 211.6805877685547Level_1: Rank of layer 'model.blocks.8.conv1': 64
+L1 norm of layer model.blocks.8.conv2 is 224.69073486328125Level_1: Rank of layer 'model.blocks.8.conv2': 64
+L1 norm of layer model.fc is 79.35004425048828Level_1: Rank of layer 'model.fc': 10
+Rank of the pruned model after training
+L1 norm of layer model.conv is 87.54756927490234Level_1: Rank of layer 'model.conv': 16
+L1 norm of layer model.blocks.0.conv1 is 123.18412780761719Level_1: Rank of layer 'model.blocks.0.conv1': 16
+L1 norm of layer model.blocks.0.conv2 is 121.0108413696289Level_1: Rank of layer 'model.blocks.0.conv2': 16
+L1 norm of layer model.blocks.1.conv1 is 120.22164916992188Level_1: Rank of layer 'model.blocks.1.conv1': 16
+L1 norm of layer model.blocks.1.conv2 is 131.67681884765625Level_1: Rank of layer 'model.blocks.1.conv2': 16
+L1 norm of layer model.blocks.2.conv1 is 121.29782104492188Level_1: Rank of layer 'model.blocks.2.conv1': 16
+L1 norm of layer model.blocks.2.conv2 is 126.90837860107422Level_1: Rank of layer 'model.blocks.2.conv2': 16
+L1 norm of layer model.blocks.3.conv1 is 244.35501098632812Level_1: Rank of layer 'model.blocks.3.conv1': 32
+L1 norm of layer model.blocks.3.conv2 is 206.12315368652344Level_1: Rank of layer 'model.blocks.3.conv2': 32
+L1 norm of layer model.blocks.3.shortcut.0 is 133.12351989746094Level_1: Rank of layer 'model.blocks.3.shortcut.0': 16
+L1 norm of layer model.blocks.4.conv1 is 195.55186462402344Level_1: Rank of layer 'model.blocks.4.conv1': 32
+L1 norm of layer model.blocks.4.conv2 is 210.89215087890625Level_1: Rank of layer 'model.blocks.4.conv2': 32
+L1 norm of layer model.blocks.5.conv1 is 199.5876922607422Level_1: Rank of layer 'model.blocks.5.conv1': 32
+L1 norm of layer model.blocks.5.conv2 is 206.37225341796875Level_1: Rank of layer 'model.blocks.5.conv2': 32
+L1 norm of layer model.blocks.6.conv1 is 392.06231689453125Level_1: Rank of layer 'model.blocks.6.conv1': 64
+L1 norm of layer model.blocks.6.conv2 is 224.24549865722656Level_1: Rank of layer 'model.blocks.6.conv2': 64
+L1 norm of layer model.blocks.6.shortcut.0 is 345.4200744628906Level_1: Rank of layer 'model.blocks.6.shortcut.0': 32
+L1 norm of layer model.blocks.7.conv1 is 205.212646484375Level_1: Rank of layer 'model.blocks.7.conv1': 64
+L1 norm of layer model.blocks.7.conv2 is 210.19723510742188Level_1: Rank of layer 'model.blocks.7.conv2': 64
+L1 norm of layer model.blocks.8.conv1 is 199.55691528320312Level_1: Rank of layer 'model.blocks.8.conv1': 64
+L1 norm of layer model.blocks.8.conv2 is 240.90179443359375Level_1: Rank of layer 'model.blocks.8.conv2': 64
+L1 norm of layer model.fc is 109.50871276855469Level_1: Rank of layer 'model.fc': 10
