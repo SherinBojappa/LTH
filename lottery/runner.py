@@ -9,6 +9,7 @@ import io
 import csv
 import torch
 import torch.nn as nn
+import numpy as np
 
 from cli import shared_args
 from dataclasses import dataclass
@@ -64,6 +65,7 @@ class LotteryRunner(Runner):
         print(self.desc.run_path(self.replicate, 0))
 
     def run(self) -> None:
+        #import pdb; pdb.set_trace()
         if self.verbose and get_platform().is_primary_process:
             print('='*82 + f'\nLottery Ticket Experiment (Replicate {self.replicate})\n' + '-'*82)
             print(self.desc.display)
@@ -76,6 +78,7 @@ class LotteryRunner(Runner):
 
         output_filename = "ranks_output_svd.txt"
         singular_values_filename = "singular_values.csv"
+        mask_filename = "mask.txt"
         if os.path.exists(output_filename):
             os.remove(output_filename)
 
@@ -85,12 +88,27 @@ class LotteryRunner(Runner):
 
         fh = open(output_filename, 'a')
         ch = open(singular_values_filename, 'a')
+        mh = open(mask_filename, 'a')
         csv_writer = csv.writer(ch)
 
         for level in range(self.levels+1):
+            #import pdb; pdb.set_trace()
             if get_platform().is_primary_process: self._prune_level(level)
+            #if level == 1:
+                # write the masks to a file
+                #new_location = self.desc.run_path(self.replicate, level)
+                #mh.write(f"Mask for magnitude pruning\n")
+                #mask = Mask.load(new_location)
+                # print the values in mask
+                #for k,v in mask.items():
+                    #mh.write(f"{k} : {v.tolist()}\n")
             get_platform().barrier()
             self._train_level(level, output_filename, fh, csv_writer)
+
+        # prune randomly
+        #import pdb; pdb.set_trace()
+        self._prune_random(output_filename, fh, csv_writer, mh)
+
 
     # Helper methods for running the lottery.
     def _pretrain(self):
@@ -170,6 +188,39 @@ class LotteryRunner(Runner):
             model = models.registry.load(old_location, self.desc.train_end_step,
                                          self.desc.model_hparams, self.desc.train_outputs)
             pruning.registry.get(self.desc.pruning_hparams)(model, Mask.load(old_location)).save(new_location)
+
+    def _prune_random(self, output_filename, fh, csv_writer, mh):
+        # this is to bypass writing to an exisiting mask file
+        level = 1
+        # indicates random pruning
+        random = True
+        new_location = self.desc.run_path(self.replicate, level+1)
+        if Mask.exists(new_location): return
+
+        # create a new mask file with all ones first
+        Mask.ones_like(models.registry.get(self.desc.model_hparams)).save(new_location)
+        # old_location now points to the initial model
+        old_location = self.desc.run_path(self.replicate, level-1)
+        # load the initial model
+        model = models.registry.load(self.desc.run_path(self.replicate, 0), self.desc.train_start_step,
+                                     self.desc.model_hparams, self.desc.train_outputs)
+        # get random mask
+        pruning.registry.get_random(self.desc.pruning_hparams)(model, Mask.load(new_location)).save(new_location)
+
+        # write the masks to a file
+        mh.write(f"Mask for random pruning\n")
+        mh.write(f"{Mask.load(new_location)}")
+
+        pruned_model = PrunedModel(model, Mask.load(new_location))
+        pruned_model.save(new_location, self.desc.train_start_step)
+        # compute rank after pruning including the level of pruning
+        fh.write(f"Rank of a random subnetwork\n")
+        self._compute_rank_svd(pruned_model, level, output_filename, fh, csv_writer)
+        # evaluate the performance of the random subnetwork
+        train.standard_train(pruned_model, new_location, self.desc.dataset_hparams, self.desc.training_hparams,
+                        start_step=self.desc.train_start_step, verbose=self.verbose,
+                        evaluate_every_epoch=self.evaluate_every_epoch)
+
 
     def _compute_rank(self, model, level, output_filename, fh):
         ranks = {}

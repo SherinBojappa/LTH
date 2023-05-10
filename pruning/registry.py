@@ -18,6 +18,12 @@ def get(pruning_hparams: PruningHparams):
     return partial(registered_strategies[pruning_hparams.pruning_strategy].prune,
                    copy.deepcopy(pruning_hparams))
 
+def get_random(pruning_hparams: PruningHparams):
+    """Get the pruning function."""
+
+    return partial(registered_strategies[pruning_hparams.pruning_strategy].prune_random,
+                   copy.deepcopy(pruning_hparams))
+
 
 def get_pruning_hparams(pruning_strategy: str) -> type:
     """Get a complete lottery schema as specialized for a particular pruning strategy."""
