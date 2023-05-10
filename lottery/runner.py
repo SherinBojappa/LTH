@@ -78,7 +78,6 @@ class LotteryRunner(Runner):
 
         output_filename = "ranks_output_svd.txt"
         singular_values_filename = "singular_values.csv"
-        mask_filename = "mask.txt"
         if os.path.exists(output_filename):
             os.remove(output_filename)
 
@@ -88,26 +87,16 @@ class LotteryRunner(Runner):
 
         fh = open(output_filename, 'a')
         ch = open(singular_values_filename, 'a')
-        mh = open(mask_filename, 'a')
         csv_writer = csv.writer(ch)
 
         for level in range(self.levels+1):
             #import pdb; pdb.set_trace()
             if get_platform().is_primary_process: self._prune_level(level)
-            #if level == 1:
-                # write the masks to a file
-                #new_location = self.desc.run_path(self.replicate, level)
-                #mh.write(f"Mask for magnitude pruning\n")
-                #mask = Mask.load(new_location)
-                # print the values in mask
-                #for k,v in mask.items():
-                    #mh.write(f"{k} : {v.tolist()}\n")
             get_platform().barrier()
             self._train_level(level, output_filename, fh, csv_writer)
 
         # prune randomly
-        #import pdb; pdb.set_trace()
-        self._prune_random(output_filename, fh, csv_writer, mh)
+        self._prune_random(output_filename, fh, csv_writer)
 
 
     # Helper methods for running the lottery.
@@ -189,7 +178,7 @@ class LotteryRunner(Runner):
                                          self.desc.model_hparams, self.desc.train_outputs)
             pruning.registry.get(self.desc.pruning_hparams)(model, Mask.load(old_location)).save(new_location)
 
-    def _prune_random(self, output_filename, fh, csv_writer, mh):
+    def _prune_random(self, output_filename, fh, csv_writer):
         # this is to bypass writing to an exisiting mask file
         level = 1
         # indicates random pruning
@@ -207,9 +196,6 @@ class LotteryRunner(Runner):
         # get random mask
         pruning.registry.get_random(self.desc.pruning_hparams)(model, Mask.load(new_location)).save(new_location)
 
-        # write the masks to a file
-        mh.write(f"Mask for random pruning\n")
-        mh.write(f"{Mask.load(new_location)}")
 
         pruned_model = PrunedModel(model, Mask.load(new_location))
         pruned_model.save(new_location, self.desc.train_start_step)
