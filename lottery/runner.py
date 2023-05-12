@@ -76,8 +76,8 @@ class LotteryRunner(Runner):
         if get_platform().is_primary_process: self._establish_initial_weights()
         get_platform().barrier()
 
-        output_filename = "ranks_output_svd.txt"
-        singular_values_filename = "singular_values.csv"
+        output_filename = "mlp_ranks_output_svd.txt"
+        singular_values_filename = "mlp_singular_values.csv"
         if os.path.exists(output_filename):
             os.remove(output_filename)
 
