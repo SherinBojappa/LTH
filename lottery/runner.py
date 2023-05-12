@@ -206,6 +206,8 @@ class LotteryRunner(Runner):
         train.standard_train(pruned_model, new_location, self.desc.dataset_hparams, self.desc.training_hparams,
                         start_step=self.desc.train_start_step, verbose=self.verbose,
                         evaluate_every_epoch=self.evaluate_every_epoch)
+        fh.write(f"Rank of a random subnetwork after training\n")
+        self._compute_rank_svd(pruned_model, level, output_filename, fh, csv_writer)
 
 
     def _compute_rank(self, model, level, output_filename, fh):
