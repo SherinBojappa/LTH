@@ -1,0 +1,28 @@
+Model architecture
+Model(
+  (fc_layers): ModuleList(
+    (0): Linear(in_features=784, out_features=300, bias=True)
+    (1): Linear(in_features=300, out_features=300, bias=True)
+  )
+  (fc): Linear(in_features=300, out_features=10, bias=True)
+  (criterion): CrossEntropyLoss()
+)Rank of the unpruned model
+L1 norm of layer fc_layers.0 is 9485.052734375Level_0: Rank of layer 'fc_layers.0': 189
+L1 norm of layer fc_layers.1 is 5882.26806640625Level_0: Rank of layer 'fc_layers.1': 118
+L1 norm of layer fc is 192.6728515625Level_0: Rank of layer 'fc': 10
+Rank of the unpruned model after training
+L1 norm of layer model.fc_layers.0 is 53059.01953125Level_0: Rank of layer 'model.fc_layers.0': 1
+L1 norm of layer model.fc_layers.1 is 20339.322265625Level_0: Rank of layer 'model.fc_layers.1': 1
+L1 norm of layer model.fc is 409.29803466796875Level_0: Rank of layer 'model.fc': 10
+Rank of the pruned model before training
+L1 norm of layer model.fc_layers.0 is 983.232666015625Level_1: Rank of layer 'model.fc_layers.0': 116
+L1 norm of layer model.fc_layers.1 is 673.327392578125Level_1: Rank of layer 'model.fc_layers.1': 60
+L1 norm of layer model.fc is 1.3424397706985474Level_1: Rank of layer 'model.fc': 5
+Rank of the pruned model after training
+L1 norm of layer model.fc_layers.0 is 8313.7802734375Level_1: Rank of layer 'model.fc_layers.0': 73
+L1 norm of layer model.fc_layers.1 is 996.51220703125Level_1: Rank of layer 'model.fc_layers.1': 14
+L1 norm of layer model.fc is 12.694218635559082Level_1: Rank of layer 'model.fc': 7
+Rank of a random subnetwork
+L1 norm of layer model.fc_layers.0 is 624.1591796875Level_1: Rank of layer 'model.fc_layers.0': 136
+L1 norm of layer model.fc_layers.1 is 55.454795837402344Level_1: Rank of layer 'model.fc_layers.1': 55
+L1 norm of layer model.fc is 0.24469229578971863Level_1: Rank of layer 'model.fc': 1
