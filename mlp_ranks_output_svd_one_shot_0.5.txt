@@ -1,0 +1,32 @@
+Model architecture
+Model(
+  (fc_layers): ModuleList(
+    (0): Linear(in_features=784, out_features=300, bias=True)
+    (1): Linear(in_features=300, out_features=300, bias=True)
+  )
+  (fc): Linear(in_features=300, out_features=10, bias=True)
+  (criterion): CrossEntropyLoss()
+)Rank of the unpruned model
+L1 norm of layer fc_layers.0 is 9464.5751953125Level_0: Rank of layer 'fc_layers.0': 189
+L1 norm of layer fc_layers.1 is 5838.806640625Level_0: Rank of layer 'fc_layers.1': 116
+L1 norm of layer fc is 200.6332550048828Level_0: Rank of layer 'fc': 10
+Rank of the unpruned model after training
+L1 norm of layer model.fc_layers.0 is 51758.515625Level_0: Rank of layer 'model.fc_layers.0': 1
+L1 norm of layer model.fc_layers.1 is 19507.1484375Level_0: Rank of layer 'model.fc_layers.1': 1
+L1 norm of layer model.fc is 413.35479736328125Level_0: Rank of layer 'model.fc': 10
+Rank of the pruned model before training
+L1 norm of layer model.fc_layers.0 is 4880.068359375Level_1: Rank of layer 'model.fc_layers.0': 1
+L1 norm of layer model.fc_layers.1 is 3078.308837890625Level_1: Rank of layer 'model.fc_layers.1': 88
+L1 norm of layer model.fc is 78.29702758789062Level_1: Rank of layer 'model.fc': 10
+Rank of the pruned model after training
+L1 norm of layer model.fc_layers.0 is 27789.4453125Level_1: Rank of layer 'model.fc_layers.0': 13
+L1 norm of layer model.fc_layers.1 is 11659.9814453125Level_1: Rank of layer 'model.fc_layers.1': 6
+L1 norm of layer model.fc is 165.86849975585938Level_1: Rank of layer 'model.fc': 10
+Rank of a random subnetwork
+L1 norm of layer model.fc_layers.0 is 3811.595703125Level_1: Rank of layer 'model.fc_layers.0': 168
+L1 norm of layer model.fc_layers.1 is 1435.82861328125Level_1: Rank of layer 'model.fc_layers.1': 114
+L1 norm of layer model.fc is 24.842153549194336Level_1: Rank of layer 'model.fc': 10
+Rank of a random subnetwork after training
+L1 norm of layer model.fc_layers.0 is 24662.2578125Level_1: Rank of layer 'model.fc_layers.0': 29
+L1 norm of layer model.fc_layers.1 is 5769.201171875Level_1: Rank of layer 'model.fc_layers.1': 50
+L1 norm of layer model.fc is 72.23956298828125Level_1: Rank of layer 'model.fc': 10
